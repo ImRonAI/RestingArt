@@ -17,7 +17,6 @@ export default function MainContent({ entered = false }: { entered?: boolean }) 
     offset: ["start start", "end end"]
   });
 
-  // Robust playback trigger that reacts to both interaction and browser strictness
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -27,16 +26,14 @@ export default function MainContent({ entered = false }: { entered?: boolean }) 
     v.defaultMuted = true;
     v.setAttribute('muted', '');
 
-    if (entered) {
-      const playPromise = v.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn("Autoplay was blocked or failed:", err);
-          // Retry on subsequent interaction if needed, or handle gracefullly
-        });
-      }
+    // Play on mount (satisfies browsers that ignore the autoPlay attribute)
+    const playPromise = v.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.warn("Autoplay was blocked or failed:", err);
+      });
     }
-  }, [entered]);
+  }, []);
 
   return (
     <div ref={containerRef} className="relative w-full bg-transparent overflow-visible">
@@ -44,16 +41,22 @@ export default function MainContent({ entered = false }: { entered?: boolean }) 
       {/* 1. Cinematic Entry: Wasatch Work of Art */}
       <section className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-black z-10">
         {/* User's Background Video from public folder */}
-        <video 
-          ref={videoRef}
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 pointer-events-none"
-          src="/background.mp4"
-        />
+        <div className="absolute inset-0 z-0 overflow-hidden bg-black">
+          <video 
+            ref={videoRef}
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            preload="auto"
+            className="w-full h-full object-cover"
+          >
+            {/* Cache-busted source to ensure 14MB file is used over any old corrupted cache */}
+            <source src="/background.mp4?v=14mb_v1" type="video/mp4" />
+          </video>
+          {/* Dark luxury overlay for readability */}
+          <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none"></div>
+        </div>
 
         <motion.div 
           className="relative z-20 text-center flex flex-col items-center px-4 mt-20"
