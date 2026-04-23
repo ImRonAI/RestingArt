@@ -122,7 +122,6 @@ function SceneLighting() {
 export default function Hero3D() {
   return (
     <>
-      <color attach="background" args={['#ffffff']} />
       <SceneLighting />
     </>
   );

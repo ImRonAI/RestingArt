@@ -89,163 +89,155 @@ const CATEGORIES = [
   }
 ];
 
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
 export default function VerticalAccordion() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
+  useEffect(() => {
+    let ctx = gsap.context(() => {
+      const items = gsap.utils.toArray<HTMLElement>('.accordion-item');
+      
+        const totalProducts = CATEGORIES.reduce((acc, cat) => acc + cat.products.length, 0);
+        
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: `+=${totalProducts * 1500}`, // Hugely expanded scroll distance to force deceleration
+          pin: true,     
+          scrub: 3,      // CRITICAL FIX: Heavy 3-second inertia smoothing to completely eliminate manual scroll jitter/manic input
+          invalidateOnRefresh: true,
+        }
+      });
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const totalSections = CATEGORIES.length;
-    const progressPerSection = 1 / totalSections;
-    
-    const index = Math.min(Math.floor(latest / progressPerSection), totalSections - 1);
-    
-    if (index !== activeIndex && index >= 0) {
-      setActiveIndex(index);
-    }
+      items.forEach((item, i) => {
+        const imageStrip = item.querySelector('.image-strip');
+        
+        // 1. Horizontal Scroll Images (The current active section)
+        if (imageStrip) {
+          tl.to(imageStrip, { 
+            x: () => {
+                const parent = imageStrip.parentElement;
+                return parent ? -(imageStrip.scrollWidth - parent.clientWidth) : 0;
+            }, 
+            ease: "none",
+            duration: 40 // Massively lengthened proportion so traversing takes the vast majority of the scrub phase
+          });
+        }
+        
+        // 2. Synchronized Section Transition (if not the last section)
+        if (i < items.length - 1) {
+          const currentContent = item.querySelector('.cat-content');
+          const currentTabTitle = item.querySelector('.tab-title');
+          
+          const nextItem = items[i + 1];
+          const nextContent = nextItem.querySelector('.cat-content');
+          const nextTabTitle = nextItem.querySelector('.tab-title');
 
-    const sectionStart = index * progressPerSection;
-    const sectionProgress = (latest - sectionStart) / progressPerSection;
-    
-    const scroller = scrollerRefs.current[index];
-    if (scroller) {
-      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
-      scroller.scrollLeft = sectionProgress * maxScroll;
-    }
-  });
+          const transLabel = `trans_${i}`;
+          tl.addLabel(transLabel);
 
-  const scrollToIndex = (index: number) => {
-    if (!containerRef.current) return;
-    const scrollTarget = (index / CATEGORIES.length) * containerRef.current.scrollHeight;
-    window.scrollTo({
-      top: containerRef.current.offsetTop + scrollTarget,
-      behavior: 'smooth'
-    });
-  };
+          // Majestic, heavily damped structural morph that feels perfectly engineered
+          // We use power2.inOut for an elegant, non-abrupt velocity curve
+          // CRITICAL: We move the opacity fades INTO the exact same timeline position as the flex morph
+          // so the content crossfades flawlessly as the container unmasks it, avoiding any sequential jarring.
+          tl.to(item, { flex: 1, duration: 16, backgroundColor: '#f8fafc', ease: 'power2.inOut' }, transLabel);
+          tl.to(currentContent, { autoAlpha: 0, duration: 16, ease: 'power2.inOut' }, transLabel);
+          tl.to(currentTabTitle, { color: '#94a3b8', duration: 16, ease: 'power1.out' }, transLabel);
 
-  const shiftHorizontal = (dir: 'left' | 'right', index: number) => {
-    const scroller = scrollerRefs.current[index];
-    if (scroller) {
-      const amount = scroller.clientWidth * 0.8;
-      scroller.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' });
-    }
-  };
+          tl.to(nextItem, { flex: 20, duration: 16, backgroundColor: '#ffffff', ease: 'power2.inOut' }, transLabel);
+          tl.to(nextContent, { autoAlpha: 1, duration: 16, ease: 'power2.inOut' }, transLabel);
+          tl.to(nextTabTitle, { color: '#f97316', duration: 16, ease: 'power1.in' }, transLabel);
+        }
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section ref={containerRef} className="relative w-full h-[700vh] bg-white">
-      <div className="sticky top-0 w-full h-screen overflow-hidden flex flex-col md:flex-row">
-        {CATEGORIES.map((cat, i) => {
-          const isActive = activeIndex === i;
+    <section ref={containerRef} className="accordion-wrapper relative w-full h-[100dvh] bg-slate-900 pointer-events-auto z-20 overflow-hidden">
+      <div className="w-full h-full flex flex-col md:flex-row bg-slate-50">
+        {CATEGORIES.map((cat, i) => (
+          <div
+            key={cat.id}
+            className="accordion-item relative flex flex-col md:flex-row overflow-hidden border-b md:border-b-0 md:border-r border-slate-200/50"
+            // Set first item explicitly to Open state
+            style={{ 
+                flex: i === 0 ? 20 : 1, 
+                backgroundColor: i === 0 ? '#ffffff' : '#f8fafc' 
+            }}
+          >
+              {/* Vertical Tab */}
+            <div className="flex-shrink-0 flex items-center justify-center p-4 md:p-0 h-[8vh] md:h-full w-full md:w-[80px] z-30 pointer-events-none">
+              <h3 className={`tab-title font-sans tracking-[0.3em] uppercase text-[10px] md:rotate-180 md:[writing-mode:vertical-rl] whitespace-nowrap font-bold transition-colors duration-500 ${i === 0 ? 'text-orange-500' : 'text-slate-400'}`}>
+                {cat.title}
+              </h3>
+            </div>
 
-          return (
-            <motion.div
-              key={cat.id}
-              className="relative flex flex-col md:flex-row flex-1 overflow-hidden transition-all duration-700 bg-white border-l border-slate-50"
-              animate={{ 
-                flex: isActive ? (typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 16) : 1,
-              }}
+            {/* Expansive Content Window - STRICTLY SIZED TO PREVENT REFLOW CHAOS DURING ANIMATION */}
+            <div 
+                className="cat-content flex-grow flex flex-col md:flex-row relative h-full overflow-hidden shrink-0 min-h-[calc(100dvh-48vh)] min-w-[100vw] md:min-h-full md:min-w-[calc(100vw-480px)]"
+                style={{ 
+                    visibility: i === 0 ? 'visible' : 'hidden', 
+                    opacity: i === 0 ? 1 : 0 
+                }}
             >
-              <AnimatePresence>
-                {isActive && (
-                  <motion.div 
-                    className="absolute inset-0 z-0 pointer-events-none"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.3 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <video autoPlay muted loop playsInline className="w-full h-full object-cover grayscale">
-                      <source src={cat.video} type="video/mp4" />
-                    </video>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div 
-                className={`relative z-40 p-6 flex md:flex-col justify-between items-center h-full border-r border-slate-100 transition-all duration-500 shrink-0 md:w-[80px] cursor-pointer ${isActive ? 'bg-white shadow-xl' : 'bg-slate-50 opacity-60 hover:opacity-100'}`}
-                onClick={() => scrollToIndex(i)}
-              >
-                <h3 className={`font-sans tracking-[0.2em] uppercase text-[10px] md:rotate-180 md:[writing-mode:vertical-rl] whitespace-nowrap font-bold transition-all ${isActive ? 'text-orange-600' : 'text-slate-400'}`}>
+              {/* Left: Beautiful Typography & Context */}
+              <div className="w-full md:w-5/12 h-[35%] md:h-full flex flex-col justify-center p-6 md:p-12 lg:p-24 z-20 bg-white">
+                <h2 className="font-serif text-4xl md:text-6xl lg:text-7xl tracking-tighter mb-4 md:mb-8 text-slate-900 leading-[1.1]">
                   {cat.title}
-                </h3>
-                <div className={`mt-auto transition-transform ${isActive ? 'text-orange-500' : 'text-slate-300'}`}>
-                  <ChevronRight size={18} />
+                </h2>
+                <div className="relative pl-4 md:pl-6">
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 rounded-full"></div>
+                  <p className="font-sans text-slate-500 text-xs md:text-sm lg:text-base leading-relaxed max-w-sm line-clamp-3 md:line-clamp-none">
+                    {cat.description}
+                  </p>
                 </div>
               </div>
 
-              <AnimatePresence>
-                {isActive && (
-                  <motion.div 
-                    className="relative z-20 flex flex-col justify-center p-8 md:p-16 h-full w-full overflow-hidden"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                  >
-                    <div className="max-w-6xl w-full">
-                      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-                        <motion.h2 className="font-serif text-6xl md:text-8xl text-slate-900 tracking-tighter">
-                          {cat.title}
-                        </motion.h2>
-                        
-                        <div className="flex gap-4">
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); shiftHorizontal('left', i); }}
-                            className="p-4 rounded-full border border-slate-200 bg-white/80 backdrop-blur hover:bg-orange-500 hover:text-white transition-all shadow-lg"
-                          >
-                            <ChevronLeft size={20} />
-                          </button>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); shiftHorizontal('right', i); }}
-                            className="p-4 rounded-full border border-slate-200 bg-white/80 backdrop-blur hover:bg-orange-500 hover:text-white transition-all shadow-lg"
-                          >
-                            <ChevronRight size={20} />
-                          </button>
+              {/* Right: HORIZONTAL SCROLL THROUGH IMAGES */}
+              <div className="w-full md:w-7/12 h-[65%] md:h-full relative overflow-hidden bg-slate-50 flex items-center p-0">
+                  
+                  {/* Background Ambience */}
+                  <div className="absolute inset-0 z-0 pointer-events-none opacity-15">
+                    <video autoPlay muted loop playsInline className="w-full h-full object-cover grayscale mix-blend-multiply">
+                      <source src={cat.video} type="video/mp4" />
+                    </video>
+                  </div>
+
+                  {/* The Image Strip sliding track */}
+                  <div className="image-strip flex h-full items-center absolute inset-y-0 left-0 pointer-events-auto">
+                    {cat.products.map((prod) => (
+                        <div key={prod.id} className="w-screen md:w-[50vw] lg:w-[40vw] h-full flex items-center justify-center p-4 md:p-12 shrink-0 relative">
+                            {/* The Stunning Image */}
+                            <img 
+                                src={prod.img} 
+                                alt={prod.name} 
+                                className="w-full h-full max-h-[50vh] md:max-h-[70vh] object-contain filter drop-shadow-2xl z-10" 
+                            />
+
+                            {/* Elegantly Floating Tag */}
+                            <div className="absolute bottom-4 left-4 md:bottom-12 md:left-12 bg-white/95 backdrop-blur-md p-4 md:p-8 rounded-2xl md:rounded-3xl shadow-2xl z-20 flex items-center gap-4 md:gap-8 border border-white/20">
+                                <div>
+                                    <h4 className="font-serif text-lg md:text-2xl lg:text-3xl text-slate-900 mb-1 leading-none">{prod.name}</h4>
+                                    <p className="font-sans font-bold tracking-[0.2em] uppercase text-[10px] md:text-xs text-orange-500 mt-1 md:mt-2">{prod.price}</p>
+                                </div>
+                                <button className="h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 rounded-full bg-slate-900 hover:bg-orange-500 hover:scale-110 text-white flex items-center justify-center transition-all duration-300 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] shrink-0">
+                                    <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+                                </button>
+                            </div>
                         </div>
-                      </div>
-
-                      <motion.div className="bg-white/95 p-8 rounded-2xl border border-slate-100 shadow-2xl relative mb-12 max-w-2xl">
-                        <div className="absolute top-0 left-0 w-1.5 bg-orange-500 h-full"></div>
-                        <p className="font-sans text-slate-500 text-sm leading-relaxed">
-                          {cat.description}
-                        </p>
-                      </motion.div>
-
-                      <div 
-                        ref={el => scrollerRefs.current[i] = el}
-                        className="flex gap-8 overflow-x-auto no-scrollbar pb-12 scroll-smooth pointer-events-auto"
-                      >
-                        {cat.products.map((p) => (
-                          <div 
-                            key={p.id}
-                            className="group relative min-w-[280px] md:min-w-[340px] bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all"
-                          >
-                            <div className="aspect-[4/5] overflow-hidden bg-slate-50 relative">
-                              <img src={p.img} alt={p.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-                              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-all"></div>
-                              <button className="absolute bottom-6 right-6 p-5 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-2xl translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 font-bold uppercase tracking-widest text-[10px] flex items-center gap-3">
-                                <ShoppingCart size={18} />
-                                Add To Cart
-                              </button>
-                            </div>
-                            <div className="p-8">
-                              <h5 className="font-serif text-2xl text-slate-800 mb-2">{p.name}</h5>
-                              <p className="font-sans font-bold text-orange-600 text-sm tracking-widest">{p.price}</p>
-                            </div>
-                          </div>
-                        ))}
-                        <div className="min-w-[100px] h-full invisible" />
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          );
-        })}
+                    ))}
+                  </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

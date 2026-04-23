@@ -8,48 +8,55 @@ import RepurposeSection from './sections/RepurposeSection';
 import UtahNeighborhoodsSection from './sections/UtahNeighborhoodsSection';
 import FooterSections from './FooterSections';
 
-export default function MainContent() {
+export default function MainContent({ entered = false }: { entered?: boolean }) {
   const containerRef = useRef(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
+  // Robust playback trigger that reacts to both interaction and browser strictness
   useEffect(() => {
-    // Force play on mount to bypass some browser edge cases
-    if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.warn("Manual video play failed (expected on some browsers):", err);
-      });
+    const v = videoRef.current;
+    if (!v) return;
+
+    // Direct DOM manipulation for attributes that React props sometimes handle inconsistently
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('muted', '');
+
+    if (entered) {
+      const playPromise = v.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Autoplay was blocked or failed:", err);
+          // Retry on subsequent interaction if needed, or handle gracefullly
+        });
+      }
     }
-  }, []);
+  }, [entered]);
 
   return (
     <div ref={containerRef} className="relative w-full bg-transparent overflow-visible">
       
       {/* 1. Cinematic Entry: Wasatch Work of Art */}
-      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-        {/* User's Embedded Background Video */}
-        <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-          <video 
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-            preload="auto"
-          >
-            {/* Cache-busted source to ensure 14MB file is used over any old corrupted cache */}
-            <source src="/background.mp4?v=14mb_v1" type="video/mp4" />
-          </video>
-          {/* Dark luxury overlay for readability explicitly requested */}
-          <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none"></div>
-        </div>
+      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-black z-10">
+        {/* User's Background Video from public folder */}
+        <video 
+          ref={videoRef}
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 pointer-events-none"
+          src="/background.mp4"
+        />
 
         <motion.div 
-          className="relative z-10 text-center flex flex-col items-center px-4 mt-20"
+          className="relative z-20 text-center flex flex-col items-center px-4 mt-20"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -65,8 +72,9 @@ export default function MainContent() {
             <a href="/about-us" className="px-8 py-4 border border-offwhite/30 rounded-full text-offwhite uppercase tracking-widest text-xs hover:bg-offwhite hover:text-charcoal transition-colors duration-500 backdrop-blur-md">
               Our Story
             </a>
-            <a href="/shop" className="px-8 py-4 bg-orange-500 border border-orange-500 rounded-full text-white uppercase tracking-widest text-xs hover:bg-orange-600 transition-colors duration-500 font-bold shadow-lg shadow-orange-500/20">
-              Shop Now
+            <a href="/shop" className="px-8 py-4 bg-gradient-to-r from-blue-500 via-green-500 to-yellow-500 rounded-full text-white uppercase tracking-widest text-xs hover:scale-105 transition-all duration-500 font-bold shadow-lg shadow-green-500/20 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <span className="relative z-10 text-shadow-sm">Shop Now</span>
             </a>
           </div>
         </motion.div>

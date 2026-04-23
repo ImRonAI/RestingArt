@@ -98,11 +98,11 @@ export default function HeroOverlay({ onEnter, fadeOut }: Props) {
             >
               <span className="relative z-10 font-sans tracking-[0.2em] uppercase text-xs text-slate-700 transition-colors duration-500 group-hover:text-white flex items-center gap-4 font-bold">
                 Enter the Store
-                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 group-hover:bg-white transition-colors duration-500"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-800 group-hover:bg-white transition-colors duration-500"></div>
               </span>
               
-              {/* Magnetic Fill Animation that perfectly sweeps up */}
-              <div className="absolute left-0 bottom-0 top-auto right-0 bg-orange-500 h-0 group-hover:h-full transition-all duration-500 ease-[0.16,1,0.3,1] z-0 rounded-full"></div>
+              {/* Vibrant Multicolor Fill Animation that perfectly sweeps up */}
+              <div className="absolute left-0 bottom-0 top-auto right-0 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 h-0 group-hover:h-full transition-all duration-500 ease-[0.16,1,0.3,1] z-0 rounded-full"></div>
             </motion.button>
           </motion.div>
         </motion.div>

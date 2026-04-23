@@ -24,6 +24,7 @@ export default function App() {
 
   const handleEnter = () => {
     setEntered(true);
+
     // Smoothly scroll down to the MainContent once unlocked
     setTimeout(() => {
       window.scrollTo({
@@ -37,10 +38,10 @@ export default function App() {
     <main className="relative w-full bg-slate-50 overflow-x-hidden selection:bg-orange-500/30 selection:text-slate-900">
       
       {/* 3D Canvas Layer */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-50 pointer-events-none">
         <Canvas 
           camera={{ position: [0, 0, 6], fov: 45 }}
-          gl={{ antialias: true, alpha: false }}
+          gl={{ antialias: true, alpha: true }}
           dpr={[1, 2]}
         >
           <Suspense fallback={null}>
@@ -52,7 +53,7 @@ export default function App() {
       {/* High-Visibility Splat Layer - REMOVED AS REQUESTED */}
 
       {/* Pure Typography Layer (Hides completely after scrolling past to save DOM) */}
-      <div className="relative w-full h-screen z-10 pointer-events-none">
+      <div className="relative w-full h-screen z-[100] pointer-events-none">
         <AnimatePresence>
           {!entered && (
             <motion.div 
@@ -68,7 +69,7 @@ export default function App() {
 
       {/* Rest of the site */}
       <div className="relative w-full z-20">
-        <MainContent />
+        <MainContent entered={entered} />
       </div>
 
     </main>
