@@ -76,6 +76,7 @@ export default function RepurposeSection() {
              {/* Drab (Before) Image - Always visible underneath */}
              <div className="absolute inset-0 w-full h-full">
                <img 
+                  id="drab-before-image"
                   src="/drab.png" 
                   alt="Drab furniture before restoration" 
                   className="w-full h-full object-cover"
@@ -88,6 +89,7 @@ export default function RepurposeSection() {
                style={{ clipPath: "inset(0% 100% 0% 0%)" }}
              >
                <img 
+                  id="fab-after-image"
                   src="/fab.png" 
                   alt="Fabulous furniture after restoration" 
                   className="w-full h-full object-cover"
