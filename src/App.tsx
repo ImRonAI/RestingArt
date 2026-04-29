@@ -40,6 +40,7 @@ export default function App() {
       {/* 3D Canvas Layer */}
       <div className="fixed inset-0 z-50 pointer-events-none">
         <Canvas 
+          style={{ pointerEvents: 'none' }}
           camera={{ position: [0, 0, 6], fov: 45 }}
           gl={{ antialias: true, alpha: true }}
           dpr={[1, 2]}

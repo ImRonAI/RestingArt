@@ -215,7 +215,6 @@ function MapController({ activeId }: { activeId: string }) {
 
 export default function UtahNeighborhoodsSection() {
   const [activeId, setActiveId] = useState(UTAH_REGIONS[0].id);
-  const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -228,7 +227,7 @@ export default function UtahNeighborhoodsSection() {
   const activeRegion = UTAH_REGIONS.find(r => r.id === activeId) || UTAH_REGIONS[0];
 
   return (
-    <section id="utah" className="relative w-full bg-[#EAE8E3] text-slate-900 border-t border-black/10 overflow-hidden">
+    <section id="utah" className="relative w-full bg-[#EAE8E3] text-slate-900 border-t border-black/10 overflow-hidden z-40 pointer-events-auto">
       
       {/* Header */}
       <div className="w-full px-6 lg:px-16 pt-32 pb-12">
@@ -272,10 +271,9 @@ export default function UtahNeighborhoodsSection() {
                 defaultZoom={12}
                 defaultCenter={{ lat: UTAH_REGIONS[0].lat, lng: UTAH_REGIONS[0].lng }}
                 mapId="DEMO_MAP_ID"
-                disableDefaultUI={true}
-                gestureHandling={isMobile ? "cooperative" : "greedy"}
-                className="w-full h-full"
-                styles={MAP_STYLES}
+                disableDefaultUI={false}
+                gestureHandling="greedy"
+                className="w-full h-full pointer-events-auto"
               >
                 <MapController activeId={activeId} />
                 
@@ -283,35 +281,18 @@ export default function UtahNeighborhoodsSection() {
                    <AdvancedMarker 
                      key={region.id} 
                      position={{ lat: region.lat, lng: region.lng }}
-                     onMouseEnter={() => setHoveredMarkerId(region.id)}
-                     onMouseLeave={() => setHoveredMarkerId(null)}
                      onClick={() => setActiveId(region.id)}
-                     zIndex={activeId === region.id ? 100 : hoveredMarkerId === region.id ? 90 : 1}
+                     zIndex={activeId === region.id ? 100 : 1}
+                     clickable={true}
                    >
                      {/* Chic Minimalist Marker */}
-                     <div className={`w-5 h-5 rounded-full border-4 shadow-xl transition-all duration-300 ${activeId === region.id ? 'bg-orange-600 border-white scale-125' : 'bg-slate-800 border-[#EAE8E3] hover:scale-110'}`} />
-                     
-                     {/* Map Hover Popup Overlay - Shows Image & Blurb when hovered */}
-                     <AnimatePresence>
-                       {(hoveredMarkerId === region.id && activeId !== region.id) && !isMobile && (
-                          <motion.div 
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-64 bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-xl pointer-events-none"
-                            style={{ transformOrigin: 'bottom center', zIndex: 90 }}
-                          >
-                             <div className="relative w-full h-32 rounded-xl overflow-hidden mb-3">
-                               <img src={region.img} alt={region.name} className="w-full h-full object-cover" />
-                             </div>
-                             <div className="px-2 pb-2">
-                                <h4 className="font-serif text-base leading-tight mb-1 text-slate-900">{region.name}</h4>
-                                <p className="font-sans text-[10px] text-slate-500 line-clamp-2 leading-relaxed">{region.blurb}</p>
-                             </div>
-                          </motion.div>
-                       )}
-                     </AnimatePresence>
+                     <div 
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           setActiveId(region.id);
+                        }}
+                        className={`w-6 h-6 rounded-full border-4 shadow-xl transition-all duration-300 pointer-events-auto relative z-[100] ${activeId === region.id ? 'bg-orange-600 border-white scale-125' : 'bg-slate-800 border-[#EAE8E3] hover:scale-110 cursor-pointer'}`} 
+                     />
                    </AdvancedMarker>
                 ))}
               </Map>

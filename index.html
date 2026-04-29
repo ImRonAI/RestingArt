@@ -3,7 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>Resting Art | Custom Furniture for Utah Homes</title>
+    <meta name="description" content="Functional masterpieces: art-inspired furniture for discerning Utah homes. Shop custom furniture in Salt Lake City, Park City, and beyond." />
+    
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Resting Art",
+      "description": "Functional masterpieces: art-inspired furniture for discerning Utah homes",
+      "url": "https://restingart.com",
+      "logo": "https://restingart.com/logo.png",
+      "sameAs": [
+        "https://instagram.com/restingart",
+        "https://pinterest.com/restingart"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FurnitureStore",
+      "name": "Resting Art - Utah Showroom",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Salt Lake City",
+        "addressRegion": "UT"
+      },
+      "priceRange": "$$$",
+      "areaServed": [
+        {"@type": "City", "name": "Salt Lake City"},
+        {"@type": "City", "name": "Park City"},
+        {"@type": "State", "name": "Utah"}
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

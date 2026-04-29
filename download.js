@@ -56,8 +56,8 @@ async function downloadFile(id, dest) {
   });
 }
 
-const fileId = '10Py2OhYlcUejugir2Fd0ZpOYNTP-PNqC';
-const destination = 'public/background.mp4';
+const fileId = '1ueT3DVJP4NfTbQxV8HVwBS77EFpuZK_7';
+const destination = 'public/hero-video.mp4';
 
 if (!fs.existsSync('public')) fs.mkdirSync('public');
 

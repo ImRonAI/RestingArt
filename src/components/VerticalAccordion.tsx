@@ -107,9 +107,9 @@ export default function VerticalAccordion() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: `+=${totalProducts * 1500}`, // Hugely expanded scroll distance to force deceleration
+          end: `+=${totalProducts * 300}`, // Reduced scroll distance for less 'stickiness'
           pin: true,     
-          scrub: 3,      // CRITICAL FIX: Heavy 3-second inertia smoothing to completely eliminate manual scroll jitter/manic input
+          scrub: 1.0,      // More responsive scrub
           invalidateOnRefresh: true,
         }
       });
@@ -125,7 +125,7 @@ export default function VerticalAccordion() {
                 return parent ? -(imageStrip.scrollWidth - parent.clientWidth) : 0;
             }, 
             ease: "none",
-            duration: 40 // Massively lengthened proportion so traversing takes the vast majority of the scrub phase
+            duration: 100 // Proportionally larger so it takes the vast majority of the scrub phase
           });
         }
         
@@ -142,18 +142,18 @@ export default function VerticalAccordion() {
           tl.addLabel(transLabel);
 
           // Majestic, heavily damped structural morph that feels perfectly engineered
-          // We use power2.inOut for an elegant, non-abrupt velocity curve
-          // CRITICAL: We move the opacity fades INTO the exact same timeline position as the flex morph
-          // so the content crossfades flawlessly as the container unmasks it, avoiding any sequential jarring.
-          tl.to(item, { flex: 1, duration: 16, backgroundColor: '#f8fafc', ease: 'power2.inOut' }, transLabel);
-          tl.to(currentContent, { autoAlpha: 0, duration: 16, ease: 'power2.inOut' }, transLabel);
-          tl.to(currentTabTitle, { color: '#94a3b8', duration: 16, ease: 'power1.out' }, transLabel);
+          tl.to(item, { flex: 1, duration: 25, backgroundColor: 'rgba(255,255,255,0)', ease: 'power2.inOut' }, transLabel);
+          tl.to(currentContent, { autoAlpha: 0, duration: 25, ease: 'power2.inOut' }, transLabel);
+          tl.to(currentTabTitle, { color: '#94a3b8', duration: 25, ease: 'power1.out' }, transLabel);
 
-          tl.to(nextItem, { flex: 20, duration: 16, backgroundColor: '#ffffff', ease: 'power2.inOut' }, transLabel);
-          tl.to(nextContent, { autoAlpha: 1, duration: 16, ease: 'power2.inOut' }, transLabel);
-          tl.to(nextTabTitle, { color: '#f97316', duration: 16, ease: 'power1.in' }, transLabel);
+          tl.to(nextItem, { flex: 30, duration: 25, backgroundColor: '#ffffff', ease: 'power2.inOut' }, transLabel);
+          tl.to(nextContent, { autoAlpha: 1, duration: 25, ease: 'power2.inOut' }, transLabel);
+          tl.to(nextTabTitle, { color: '#f97316', duration: 25, ease: 'power1.in' }, transLabel);
         }
       });
+
+      // Just cleanly append a tiny margin to the end of timeline
+      tl.to({}, { duration: 10 });
     }, containerRef);
 
     return () => ctx.revert();
@@ -161,19 +161,19 @@ export default function VerticalAccordion() {
 
   return (
     <section ref={containerRef} className="accordion-wrapper relative w-full h-[100dvh] bg-slate-900 pointer-events-auto z-20 overflow-hidden">
-      <div className="w-full h-full flex flex-col md:flex-row bg-slate-50">
+      <div className="w-full h-full flex flex-col md:flex-row bg-slate-50 relative z-10">
         {CATEGORIES.map((cat, i) => (
           <div
             key={cat.id}
             className="accordion-item relative flex flex-col md:flex-row overflow-hidden border-b md:border-b-0 md:border-r border-slate-200/50"
             // Set first item explicitly to Open state
             style={{ 
-                flex: i === 0 ? 20 : 1, 
-                backgroundColor: i === 0 ? '#ffffff' : '#f8fafc' 
+                flex: i === 0 ? 30 : 1, 
+                backgroundColor: i === 0 ? '#ffffff' : 'rgba(255,255,255,0)' 
             }}
           >
               {/* Vertical Tab */}
-            <div className="flex-shrink-0 flex items-center justify-center p-4 md:p-0 h-[8vh] md:h-full w-full md:w-[80px] z-30 pointer-events-none">
+            <div className="flex-shrink-0 flex items-center justify-center p-0 h-[40px] md:h-full w-full md:w-[80px] z-[100] pointer-events-none">
               <h3 className={`tab-title font-sans tracking-[0.3em] uppercase text-[10px] md:rotate-180 md:[writing-mode:vertical-rl] whitespace-nowrap font-bold transition-colors duration-500 ${i === 0 ? 'text-orange-500' : 'text-slate-400'}`}>
                 {cat.title}
               </h3>
@@ -181,15 +181,15 @@ export default function VerticalAccordion() {
 
             {/* Expansive Content Window - STRICTLY SIZED TO PREVENT REFLOW CHAOS DURING ANIMATION */}
             <div 
-                className="cat-content flex-grow flex flex-col md:flex-row relative h-full overflow-hidden shrink-0 min-h-[calc(100dvh-48vh)] min-w-[100vw] md:min-h-full md:min-w-[calc(100vw-480px)]"
+                className="cat-content flex-grow flex flex-col md:flex-row relative h-[calc(100%-40px)] md:h-full overflow-hidden shrink-0 min-h-[50vh] min-w-[100vw] md:min-h-full md:min-w-[calc(100vw-480px)] bg-transparent"
                 style={{ 
                     visibility: i === 0 ? 'visible' : 'hidden', 
                     opacity: i === 0 ? 1 : 0 
                 }}
             >
               {/* Left: Beautiful Typography & Context */}
-              <div className="w-full md:w-5/12 h-[35%] md:h-full flex flex-col justify-center p-6 md:p-12 lg:p-24 z-20 bg-white">
-                <h2 className="font-serif text-4xl md:text-6xl lg:text-7xl tracking-tighter mb-4 md:mb-8 text-slate-900 leading-[1.1]">
+              <div className="w-full md:w-5/12 h-[40%] md:h-full flex flex-col justify-center p-6 md:p-12 lg:p-24 z-20 bg-transparent">
+                <h2 className="font-serif text-4xl md:text-6xl lg:text-7xl tracking-tighter mb-2 md:mb-8 text-slate-900 leading-[1.1]">
                   {cat.title}
                 </h2>
                 <div className="relative pl-4 md:pl-6">
@@ -201,13 +201,10 @@ export default function VerticalAccordion() {
               </div>
 
               {/* Right: HORIZONTAL SCROLL THROUGH IMAGES */}
-              <div className="w-full md:w-7/12 h-[65%] md:h-full relative overflow-hidden bg-slate-50 flex items-center p-0">
+              <div className="w-full md:w-7/12 h-[60%] md:h-full relative overflow-hidden flex items-center p-0">
                   
                   {/* Background Ambience */}
                   <div className="absolute inset-0 z-0 pointer-events-none opacity-15">
-                    <video autoPlay muted loop playsInline className="w-full h-full object-cover grayscale mix-blend-multiply">
-                      <source src={cat.video} type="video/mp4" />
-                    </video>
                   </div>
 
                   {/* The Image Strip sliding track */}
@@ -218,16 +215,16 @@ export default function VerticalAccordion() {
                             <img 
                                 src={prod.img} 
                                 alt={prod.name} 
-                                className="w-full h-full max-h-[50vh] md:max-h-[70vh] object-contain filter drop-shadow-2xl z-10" 
+                                className="w-full h-full max-h-[40vh] md:max-h-[70vh] object-contain filter drop-shadow-2xl z-10 pb-20 md:pb-0" 
                             />
 
                             {/* Elegantly Floating Tag */}
-                            <div className="absolute bottom-4 left-4 md:bottom-12 md:left-12 bg-white/95 backdrop-blur-md p-4 md:p-8 rounded-2xl md:rounded-3xl shadow-2xl z-20 flex items-center gap-4 md:gap-8 border border-white/20">
-                                <div>
-                                    <h4 className="font-serif text-lg md:text-2xl lg:text-3xl text-slate-900 mb-1 leading-none">{prod.name}</h4>
+                            <div className="absolute bottom-6 left-4 right-4 md:bottom-12 md:left-12 md:right-auto bg-white/95 backdrop-blur-md p-4 md:p-8 rounded-2xl md:rounded-3xl shadow-2xl z-30 flex items-center justify-between md:justify-start gap-3 md:gap-8 border border-white/20">
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="font-serif text-base md:text-2xl lg:text-3xl text-slate-900 mb-1 leading-none truncate">{prod.name}</h4>
                                     <p className="font-sans font-bold tracking-[0.2em] uppercase text-[10px] md:text-xs text-orange-500 mt-1 md:mt-2">{prod.price}</p>
                                 </div>
-                                <button className="h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 rounded-full bg-slate-900 hover:bg-orange-500 hover:scale-110 text-white flex items-center justify-center transition-all duration-300 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] shrink-0">
+                                <button className="h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 rounded-full bg-orange-500 md:bg-slate-900 hover:bg-orange-600 md:hover:bg-orange-500 text-white flex items-center justify-center transition-all duration-300 shadow-xl shrink-0">
                                     <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
                                 </button>
                             </div>

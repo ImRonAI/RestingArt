@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
-import { motion, useScroll } from 'motion/react';
+import { useRef, useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import VerticalAccordion from './VerticalAccordion';
 import ShowroomSection from './sections/ShowroomSection';
 import ManifestoSection from './sections/ManifestoSection';
@@ -10,53 +10,35 @@ import FooterSections from './FooterSections';
 
 export default function MainContent({ entered = false }: { entered?: boolean }) {
   const containerRef = useRef(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
 
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-
-    // Direct DOM manipulation for attributes that React props sometimes handle inconsistently
-    v.muted = true;
-    v.defaultMuted = true;
-    v.setAttribute('muted', '');
-
-    // Play on mount (satisfies browsers that ignore the autoPlay attribute)
-    const playPromise = v.play();
-    if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        console.warn("Autoplay was blocked or failed:", err);
-      });
-    }
+    // Component mounted
   }, []);
 
   return (
     <div ref={containerRef} className="relative w-full bg-transparent overflow-visible">
       
       {/* 1. Cinematic Entry: Wasatch Work of Art */}
-      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-black z-10">
-        {/* User's Background Video from public folder */}
-        <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-          <video 
-            ref={videoRef}
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-          >
-            {/* Cache-busted source to ensure 14MB file is used over any old corrupted cache */}
-            <source src="/background.mp4?v=14mb_v1" type="video/mp4" />
-          </video>
-          {/* Dark luxury overlay for readability */}
-          <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none"></div>
-        </div>
+      <section className="secondary-hero w-full h-[100dvh] flex relative items-center justify-center bg-transparent z-10">
+        <div 
+          className="secondary-hero-media-wrapper absolute inset-0 z-[-1] overflow-hidden bg-black flex items-center justify-center"
+          dangerouslySetInnerHTML={{
+            __html: `
+              <video 
+                id="secondary-hero-video"
+                autoplay 
+                muted 
+                loop 
+                playsinline
+                preload="auto"
+                class="secondary-hero-video absolute inset-0 w-full h-full object-cover pointer-events-none"
+              >
+                <source src="/hero-video.mp4" type="video/mp4" />
+              </video>
+              <div class="absolute inset-0 bg-black/40 pointer-events-none z-10"></div>
+            `
+          }}
+        />
 
         <motion.div 
           className="relative z-20 text-center flex flex-col items-center px-4 mt-20"
@@ -130,12 +112,14 @@ export default function MainContent({ entered = false }: { entered?: boolean }) 
       {/* 3-7. The Vertical Accordion of Areas */}
       <VerticalAccordion />
 
+      {/* Repurpose Section moved right after Accordion */}
+      <RepurposeSection />
+
       {/* High impact structural sections separating out from the footer grid */}
       <ShowroomSection />
       <ManifestoSection />
       <CustomDesignsSection />
       <UtahNeighborhoodsSection />
-      <RepurposeSection />
 
       {/* The remaining utility sections (Blog, Sustainability, Shipping, FAQ, Final CTA) */}
       <FooterSections />
