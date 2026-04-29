@@ -35,6 +35,7 @@ export default function RepurposeSection() {
 
       tl.to(".fab-image-container", {
         clipPath: "inset(0% 0% 0% 0%)",
+        "-webkit-clip-path": "inset(0% 0% 0% 0%)",
         ease: "none",
         duration: 20
       }, 0);
@@ -67,32 +68,32 @@ export default function RepurposeSection() {
   }, []);
 
   return (
-    <section ref={containerRef} id="repurpose" className="relative w-full h-[100dvh] z-30 bg-sky-50 text-slate-800 border-t border-slate-200 overflow-hidden pointer-events-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
+    <section ref={containerRef} id="repurpose" className="relative w-full min-h-[100dvh] z-30 bg-sky-50 text-slate-800 border-t border-slate-200 overflow-hidden pointer-events-auto shrink-0 flex">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full min-h-screen py-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
         
         {/* Visual Half - The Before/After Image */}
-        <div className="w-full flex-1 lg:w-1/2 flex items-center justify-center shrink-0 z-10 pb-8 lg:pb-0 min-h-[300px]">
+        <div className="w-full flex-1 lg:w-1/2 flex items-center justify-center shrink-0 z-10 lg:pb-0 min-h-[300px]">
           <div className="relative w-full aspect-square max-w-[500px] lg:max-w-[600px] max-h-[50vh] lg:max-h-[75vh] overflow-hidden rounded-2xl shadow-2xl bg-slate-200 select-none pointer-events-none">
              {/* Drab (Before) Image - Always visible underneath */}
-             <div className="absolute inset-0 w-full h-full">
+             <div className="absolute inset-0 w-full h-full z-0 block">
                <img 
                   id="drab-before-image"
-                  src="/drab.png" 
+                  src="/drab.jpeg" 
                   alt="Drab furniture before restoration" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover block pointer-events-none"
                />
              </div>
 
              {/* Fab (After) Image - Revealed via clipPath */}
              <div 
-               className="fab-image-container opacity-0 invisible absolute inset-0 w-full h-full z-10"
-               style={{ clipPath: "inset(0% 100% 0% 0%)" }}
+               className="fab-image-container opacity-0 invisible absolute inset-0 w-full h-full z-10 block pointer-events-none"
+               style={{ clipPath: "inset(0% 100% 0% 0%)", WebkitClipPath: "inset(0% 100% 0% 0%)" }}
              >
                <img 
                   id="fab-after-image"
-                  src="/fab.png" 
+                  src="/fab-1.png" 
                   alt="Fabulous furniture after restoration" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover block pointer-events-none"
                />
              </div>
 
@@ -114,10 +115,10 @@ export default function RepurposeSection() {
         </div>
 
         {/* Narrative Half (Absolute Crossfading Content) */}
-        <div className="w-full lg:w-1/2 flex items-center relative h-[40vh] lg:h-[60vh] z-10">
+        <div className="w-full lg:w-1/2 flex flex-col justify-center relative min-h-[30vh] lg:min-h-[50vh] z-10 shrink-0">
            
            {/* Section 1: DRAB Content */}
-           <div className="drab-content absolute inset-0 flex flex-col justify-center z-10">
+           <div className="drab-content absolute inset-0 flex flex-col justify-center z-10 p-2">
 
              <span className="text-orange-600 uppercase tracking-widest text-[10px] sm:text-xs font-bold mb-4 lg:mb-8 block">
                Donations & Restoration (Scroll to Slide)
