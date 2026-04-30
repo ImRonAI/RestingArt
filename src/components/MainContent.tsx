@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import VerticalAccordion from './VerticalAccordion';
 import ShowroomSection from './sections/ShowroomSection';
 import ManifestoSection from './sections/ManifestoSection';
@@ -9,43 +9,46 @@ import UtahNeighborhoodsSection from './sections/UtahNeighborhoodsSection';
 import FooterSections from './FooterSections';
 
 export default function MainContent({ entered = false }: { entered?: boolean }) {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Component mounted
+    if (videoRef.current) {
+      videoRef.current.defaultMuted = true;
+      videoRef.current.muted = true;
+      videoRef.current.play().catch(err => {
+        console.warn("Autoplay was blocked or failed:", err);
+      });
+    }
   }, []);
 
   return (
     <div ref={containerRef} className="relative w-full bg-transparent overflow-visible">
       
       {/* 1. Cinematic Entry: Wasatch Work of Art */}
-      <section className="secondary-hero w-full h-[100dvh] flex relative items-center justify-center bg-transparent z-10">
-        <div 
-          className="secondary-hero-media-wrapper absolute inset-0 z-[-1] overflow-hidden bg-black flex items-center justify-center"
-          dangerouslySetInnerHTML={{
-            __html: `
-              <video 
-                id="secondary-hero-video"
-                autoplay 
-                muted 
-                loop 
-                playsinline
-                preload="auto"
-                class="secondary-hero-video absolute inset-0 w-full h-full object-cover pointer-events-none"
-              >
-                <source src="/hero-video.mp4" type="video/mp4" />
-              </video>
-              <div class="absolute inset-0 bg-black/40 pointer-events-none z-10"></div>
-            `
-          }}
-        />
+      <section id="secondary-hero-section" className="secondary-hero w-full h-[100dvh] flex relative items-center justify-center bg-transparent z-10">
+        <div className="secondary-hero-media-wrapper absolute inset-0 z-[-1] overflow-hidden bg-black flex items-center justify-center">
+          <video 
+            ref={videoRef}
+            id="secondary-hero-video"
+            autoPlay 
+            muted 
+            loop 
+            playsInline
+            preload="auto"
+            className="secondary-hero-video absolute inset-0 w-full h-full object-cover pointer-events-none opacity-80"
+          >
+            <source src="/RestingMindHero.webm" type="video/webm" />
+          </video>
+          <div className="absolute inset-0 bg-black/40 pointer-events-none z-10"></div>
+        </div>
 
         <motion.div 
           className="relative z-20 text-center flex flex-col items-center px-4 mt-20"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
         >
           <span className="block text-white/60 font-sans text-[10px] tracking-[0.4em] uppercase mb-4 font-bold">
             Salt Lake City, Utah
@@ -65,14 +68,22 @@ export default function MainContent({ entered = false }: { entered?: boolean }) 
         </motion.div>
 
         {/* Scroll Indicator */}
-        <motion.div 
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-50"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        >
-          <span className="text-[10px] uppercase tracking-widest text-white mb-2 font-bold">Scroll To Explore</span>
-          <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent"></div>
-        </motion.div>
+        <AnimatePresence>
+          {entered && (
+            <motion.div 
+              className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5, y: [0, 10, 0] }}
+              transition={{ 
+                opacity: { duration: 1 },
+                y: { repeat: Infinity, duration: 2, ease: "easeInOut" }
+              }}
+            >
+              <span className="text-[10px] uppercase tracking-widest text-white mb-2 font-bold">Scroll To Explore</span>
+              <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent"></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* 2. Shop All: Product Discovery - MAKE IN VIEW AND PROMINENT */}

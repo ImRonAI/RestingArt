@@ -14,9 +14,9 @@ export default function RepurposeSection() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: "+=150%", // Scroll depth for the animation length
+          end: "+=180%", // slightly longer for more flow
           pin: true,
-          scrub: 1.0,
+          scrub: 1.5, // smoother scrub
           invalidateOnRefresh: true,
         }
       });
@@ -69,11 +69,11 @@ export default function RepurposeSection() {
 
   return (
     <section ref={containerRef} id="repurpose" className="relative w-full min-h-[100dvh] z-30 bg-sky-50 text-slate-800 border-t border-slate-200 overflow-hidden pointer-events-auto shrink-0 flex">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full min-h-screen py-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full min-h-screen py-12 lg:py-20 flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-16">
         
         {/* Visual Half - The Before/After Image */}
-        <div className="w-full flex-1 lg:w-1/2 flex items-center justify-center shrink-0 z-10 lg:pb-0 min-h-[300px]">
-          <div className="relative w-full aspect-square max-w-[500px] lg:max-w-[600px] max-h-[50vh] lg:max-h-[75vh] overflow-hidden rounded-2xl shadow-2xl bg-slate-200 select-none pointer-events-none">
+        <div className="w-full flex-1 lg:w-1/2 flex items-center justify-center shrink-0 z-10 lg:pb-0 min-h-[250px] sm:min-h-[300px]">
+          <div className="relative w-full aspect-square max-w-[320px] sm:max-w-[500px] lg:max-w-[600px] max-h-[40vh] lg:max-h-[75vh] overflow-hidden rounded-2xl shadow-2xl bg-slate-200 select-none pointer-events-none">
              {/* Drab (Before) Image - Always visible underneath */}
              <div className="absolute inset-0 w-full h-full z-0 block">
                <img 
@@ -115,34 +115,34 @@ export default function RepurposeSection() {
         </div>
 
         {/* Narrative Half (Absolute Crossfading Content) */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-center relative min-h-[30vh] lg:min-h-[50vh] z-10 shrink-0">
+        <div className="w-full lg:w-1/2 flex flex-col justify-center relative min-h-[25vh] sm:min-h-[30vh] lg:min-h-[50vh] z-10 shrink-0">
            
            {/* Section 1: DRAB Content */}
-           <div className="drab-content absolute inset-0 flex flex-col justify-center z-10 p-2">
+           <div className="drab-content absolute inset-0 flex flex-col justify-center items-center lg:items-start text-center lg:text-left z-10 p-2">
 
-             <span className="text-orange-600 uppercase tracking-widest text-[10px] sm:text-xs font-bold mb-4 lg:mb-8 block">
+             <span className="text-orange-600 uppercase tracking-widest text-[9px] sm:text-xs font-bold mb-2 lg:mb-8 block">
                Donations & Restoration (Scroll to Slide)
              </span>
-             <h2 className="font-serif text-4xl sm:text-5xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-slate-800 font-medium">
+             <h2 className="font-serif text-3xl sm:text-5xl lg:text-7xl mb-3 sm:mb-6 leading-tight text-slate-800 font-medium">
                We take <br/>
                <span className="italic text-sky-600">drab...</span>
              </h2>
-             <p className="font-sans text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-8">
-               Well-made furniture shouldn't end up in a landfill. We gladly accept donations of quality pieces and put our woodworkers to work giving them a fresh, modern update.
+             <p className="font-sans text-slate-600 text-xs sm:text-base md:text-lg leading-relaxed max-w-md lg:max-w-lg mb-4 lg:mb-8">
+               Well-made furniture shouldn't end up in a landfill. We gladly accept donations of pieces and give them a fresh update.
              </p>
            </div>
 
            {/* Section 2: FAB Content */}
-           <div className="fab-content opacity-0 invisible translate-y-8 absolute inset-0 flex flex-col justify-center z-0">
-             <span className="text-sky-600 uppercase tracking-widest text-[10px] sm:text-xs font-bold mb-4 lg:mb-8 block opacity-0">
+           <div className="fab-content opacity-0 invisible translate-y-8 absolute inset-0 flex flex-col justify-center items-center lg:items-start text-center lg:text-left z-0">
+             <span className="text-sky-600 uppercase tracking-widest text-[9px] sm:text-xs font-bold mb-2 lg:mb-8 block opacity-0">
                .
              </span>
-             <h2 className="font-serif text-4xl sm:text-5xl lg:text-7xl mb-4 sm:mb-6 leading-tight text-slate-800 font-medium">
+             <h2 className="font-serif text-3xl sm:text-5xl lg:text-7xl mb-3 sm:mb-6 leading-tight text-slate-800 font-medium">
                Make it <br/>
                <span className="italic text-sky-600">Fab.</span>
              </h2>
-             <p className="font-sans text-slate-800 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg font-medium mb-10">
-               Love your grandma's armchair but hate the pattern? Let us fix it up! We can sand, stain, repair, and apply wildly expressive art to your favorite old pieces.
+             <p className="font-sans text-slate-800 text-xs sm:text-base md:text-lg leading-relaxed max-w-md lg:max-w-lg font-medium mb-6 lg:mb-10">
+               Love your grandma's armchair but hate the pattern? We can sand, stain, and apply expressive art to your favorite old pieces.
              </p>
 
              {/* Buttons */}

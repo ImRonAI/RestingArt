@@ -11,34 +11,19 @@ import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
-  const [entered, setEntered] = useState(false);
-
-  useEffect(() => {
-    if (!entered) {
-      document.body.style.overflow = 'hidden';
-      window.scrollTo(0, 0);
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-  }, [entered]);
-
   const handleEnter = () => {
-    setEntered(true);
-
-    // Smoothly scroll down to the MainContent once unlocked
-    setTimeout(() => {
-      window.scrollTo({
-        top: window.innerHeight,
-        behavior: 'smooth'
-      });
-    }, 100);
+    // Smoothly scroll down to the secondary hero
+    const element = document.getElementById("secondary-hero-section");
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <main className="relative w-full bg-slate-50 overflow-x-hidden selection:bg-orange-500/30 selection:text-slate-900">
+    <main className="relative w-full bg-white overflow-x-hidden selection:bg-orange-500/30 selection:text-slate-900">
       
       {/* 3D Canvas Layer */}
-      <div className="fixed inset-0 z-50 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <Canvas 
           style={{ pointerEvents: 'none' }}
           camera={{ position: [0, 0, 6], fov: 45 }}
@@ -51,26 +36,13 @@ export default function App() {
         </Canvas>
       </div>
 
-      {/* High-Visibility Splat Layer - REMOVED AS REQUESTED */}
-
-      {/* Pure Typography Layer (Hides completely after scrolling past to save DOM) */}
-      <div className="relative w-full h-screen z-[100] pointer-events-none">
-        <AnimatePresence>
-          {!entered && (
-            <motion.div 
-              exit={{ opacity: 0, filter: 'blur(20px)' }}
-              transition={{ duration: 1.0 }}
-              className="absolute inset-0 pointer-events-auto"
-            >
-              <HeroOverlay onEnter={handleEnter} fadeOut={false} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Rest of the site */}
       <div className="relative w-full z-20">
-        <MainContent entered={entered} />
+        <section className="relative w-full h-[100dvh] bg-transparent z-[100] flex justify-center items-center">
+           <div className="absolute inset-0 bg-white pointer-events-none"></div>
+           <HeroOverlay onEnter={handleEnter} fadeOut={false} />
+        </section>
+
+        <MainContent entered={true} />
       </div>
 
     </main>

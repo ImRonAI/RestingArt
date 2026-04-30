@@ -107,9 +107,9 @@ export default function VerticalAccordion() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: `+=${totalProducts * 300}`, // Reduced scroll distance for less 'stickiness'
+          end: `+=${totalProducts * 350}`, // Slightly more space for air
           pin: true,     
-          scrub: 1.0,      // More responsive scrub
+          scrub: 2.0,      // Higher scrub for buttery smoothness
           invalidateOnRefresh: true,
         }
       });
@@ -142,13 +142,13 @@ export default function VerticalAccordion() {
           tl.addLabel(transLabel);
 
           // Majestic, heavily damped structural morph that feels perfectly engineered
-          tl.to(item, { flex: 1, duration: 25, backgroundColor: 'rgba(255,255,255,0)', ease: 'power2.inOut' }, transLabel);
-          tl.to(currentContent, { autoAlpha: 0, duration: 25, ease: 'power2.inOut' }, transLabel);
-          tl.to(currentTabTitle, { color: '#94a3b8', duration: 25, ease: 'power1.out' }, transLabel);
+          tl.to(item, { flex: 1, duration: 40, backgroundColor: 'rgba(255,255,255,0)', ease: 'power3.inOut' }, transLabel);
+          tl.to(currentContent, { autoAlpha: 0, scale: 0.95, duration: 40, ease: 'power3.inOut' }, transLabel);
+          tl.to(currentTabTitle, { color: '#94a3b8', duration: 40, ease: 'power2.out' }, transLabel);
 
-          tl.to(nextItem, { flex: 30, duration: 25, backgroundColor: '#ffffff', ease: 'power2.inOut' }, transLabel);
-          tl.to(nextContent, { autoAlpha: 1, duration: 25, ease: 'power2.inOut' }, transLabel);
-          tl.to(nextTabTitle, { color: '#f97316', duration: 25, ease: 'power1.in' }, transLabel);
+          tl.to(nextItem, { flex: 30, duration: 40, backgroundColor: '#ffffff', ease: 'power3.inOut' }, transLabel);
+          tl.to(nextContent, { autoAlpha: 1, scale: 1, duration: 40, ease: 'power3.inOut' }, transLabel);
+          tl.to(nextTabTitle, { color: '#f97316', duration: 40, ease: 'power2.in' }, transLabel);
         }
       });
 
