@@ -262,10 +262,10 @@ export default function UtahNeighborhoodsSection() {
       </div>
 
       {/* Split Interactive Layout */}
-      <div className="flex flex-col lg:flex-row w-full px-6 lg:px-16 pb-40 gap-16 relative">
+      <div className="flex flex-col lg:flex-row w-full px-6 lg:px-16 pb-20 lg:pb-40 gap-8 lg:gap-16 items-stretch relative">
         
         {/* Left/Top: Google Map Integration */}
-        <div className="w-full lg:w-1/2 h-[60vh] lg:h-[80vh] sticky top-[10vh] rounded-[2rem] overflow-hidden shadow-2xl z-20 bg-[#F3F1E7] border-4 border-white/50">
+        <div className="w-full lg:w-1/2 h-[400px] lg:h-auto min-h-[400px] rounded-[2rem] overflow-hidden shadow-2xl z-20 bg-[#F3F1E7] border-4 border-white/50 flex-grow">
            <APIProvider apiKey={(import.meta as any).env.VITE_GOOGLE_MAPS_API_KEY || ''}>
               <Map
                 defaultZoom={12}
@@ -300,7 +300,7 @@ export default function UtahNeighborhoodsSection() {
         </div>
 
         {/* Right/Bottom: Single Active Region Display */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-start z-10">
+        <div className="w-full lg:w-1/2 flex flex-col z-10">
            <AnimatePresence mode="wait">
              <motion.div
                key={activeRegion.id}
@@ -308,34 +308,32 @@ export default function UtahNeighborhoodsSection() {
                animate={{ opacity: 1, x: 0 }}
                exit={{ opacity: 0, x: -20 }}
                transition={{ duration: 0.4, ease: "easeOut" }}
-               className="group rounded-[2rem] p-8 lg:p-12 bg-white shadow-xl border border-white/50 text-slate-900 w-full"
+               className="group rounded-[2rem] p-6 lg:p-10 bg-white shadow-xl border border-white/50 text-slate-900 w-full h-full flex flex-col justify-center"
              >
                <span className="font-sans font-bold text-[10px] uppercase tracking-[0.2em] mb-4 block text-orange-600">
                   {UTAH_REGIONS.findIndex(r => r.id === activeRegion.id) + 1 < 10 ? `0${UTAH_REGIONS.findIndex(r => r.id === activeRegion.id) + 1}` : UTAH_REGIONS.findIndex(r => r.id === activeRegion.id) + 1} — {activeRegion.subtitle}
                </span>
-               <h3 className="font-serif text-5xl lg:text-6xl tracking-tight mb-8">
+               <h3 className="font-serif text-3xl lg:text-5xl tracking-tight mb-4 lg:mb-6">
                  {activeRegion.name}
                </h3>
                
-               <div className="mb-8 rounded-3xl overflow-hidden aspect-[4/3] relative group/img cursor-pointer shadow-lg" onClick={() => window.location.href = activeRegion.link}>
+               <div className="mb-6 rounded-2xl overflow-hidden aspect-video relative group/img cursor-pointer shadow-lg shrink-0" onClick={() => window.location.href = activeRegion.link}>
                  <img src={activeRegion.img} alt={activeRegion.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover/img:scale-105" />
                  <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover/img:bg-black/20" />
                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity duration-500">
-                    <span className="bg-white/90 backdrop-blur-sm text-slate-900 px-6 py-3 rounded-full text-xs tracking-widest uppercase font-sans shadow-2xl font-bold">Read Full Strategy</span>
+                    <span className="bg-white/90 backdrop-blur-sm text-slate-900 px-6 py-3 rounded-full text-xs tracking-widest uppercase font-sans shadow-2xl font-bold">Discover</span>
                  </div>
                </div>
 
-               <p className="font-sans text-slate-800 font-medium italic text-xl leading-relaxed mb-8 border-l-2 border-orange-600 pl-6">
-                  "{activeRegion.blurb}"
+               <p className="font-sans text-slate-600 leading-relaxed text-sm lg:text-base mb-6 flex-grow">
+                  {activeRegion.blurb}
                </p>
                
-               <p className="font-sans text-slate-600 leading-relaxed text-base lg:text-lg mb-12">
-                  {activeRegion.desc}
-               </p>
-               
-               <a href={activeRegion.link} className="inline-block font-sans text-sm font-bold tracking-widest uppercase text-slate-900 hover:text-orange-600 transition-colors border-b-2 border-slate-900 hover:border-orange-600 pb-2">
-                  Discover {activeRegion.name} &rarr;
-               </a>
+               <div className="mt-auto">
+                 <a href={activeRegion.link} className="inline-block font-sans text-xs lg:text-sm font-bold tracking-widest uppercase text-slate-900 hover:text-orange-600 transition-colors border-b-2 border-slate-900 hover:border-orange-600 pb-1 lg:pb-2">
+                    Learn More &rarr;
+                 </a>
+               </div>
              </motion.div>
            </AnimatePresence>
         </div>
